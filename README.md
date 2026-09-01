@@ -80,23 +80,23 @@
 The ShuttleSense architecture bridges IoT telemetry edge ingestion with a serverless event-driven processing backbone, pushing sub-second updates directly to web and mobile clients.
 
 ```mermaid
-flowchart TD
-    subgraph EdgeLayer["Edge Devices & Transit Fleet"]
-        VehicleNode["GPS & IR Vehicle Node"] -->|MQTT Publish| IoTTopic["shuttlesense/telemetry/shuttle_id"]
+graph TD
+    subgraph Edge["Edge Devices and Transit Fleet"]
+        VehicleNode["GPS and IR Vehicle Node"] -->|MQTT Publish| IoTTopic["shuttlesense/telemetry/shuttle_id"]
     end
 
-    subgraph AWSCloud["AWS Serverless Processing Engine"]
+    subgraph AWS["AWS Serverless Processing Engine"]
         IoTTopic -->|IoT Rule Evaluation| LambdaProc["TelemetryProcessorLambda"]
-        LambdaProc -->|PutItem with TTL| DynamoDB[("DynamoDB LiveShuttles")]
+        LambdaProc -->|PutItem with TTL| DynamoDB[(DynamoDB LiveShuttles)]
         LambdaProc -->|GraphQL Mutation| AppSyncAPI["AWS AppSync GraphQL API"]
         LambdaProc -->|Track Coordinates| LocationSvc["Amazon Location Geofencing"]
         LocationSvc -->|Geofence Breach| SNSAlert["Amazon SNS Notification Hub"]
     end
 
-    subgraph Presentation["Web & Mobile Client Interface"]
+    subgraph Clients["Web and Mobile Client Interface"]
         AppSyncAPI -->|WSS Subscriptions| AdminDashboard["React 19 Admin Operations Console"]
-        AppSyncAPI -->|WSS Subscriptions| MobileApp["Flutter Student & Driver App"]
-        CognitoAuth["Amazon Cognito User Pool"] -.->|JWT Auth| AdminDashboard
-        CognitoAuth -.->|RBAC Verification| MobileApp
+        AppSyncAPI -->|WSS Subscriptions| MobileApp["Flutter Student and Driver App"]
+        CognitoAuth["Amazon Cognito User Pool"] -->|JWT Auth| AdminDashboard
+        CognitoAuth -->|RBAC Verification| MobileApp
     end
 ```
