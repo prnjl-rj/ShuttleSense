@@ -1,75 +1,33 @@
-# React + TypeScript + Vite
+<div align="center">
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# <img src="https://img.icons8.com/isometric/512/bus.png" width="46" height="46" valign="middle" alt="ShuttleSense Logo"/> ShuttleSense
 
-Currently, two official plugins are available:
+### **IoT-Enabled Smart Shuttle Monitoring & Campus Transportation Management System**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+[![AWS Serverless](https://img.shields.io/badge/AWS-Serverless_Architecture-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
+[![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![AWS AppSync](https://img.shields.io/badge/AWS_AppSync-GraphQL_WebSockets-E7157B?logo=graphql&logoColor=white)](https://aws.amazon.com/appsync/)
+[![AWS IoT Core](https://img.shields.io/badge/AWS_IoT_Core-MQTT_Telemetry-232F3E?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/iot-core/)
+[![MapLibre GL](https://img.shields.io/badge/MapLibre_GL-Vector_Maps-3969EC?logo=maplibre&logoColor=white)](https://maplibre.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## React Compiler
+<p align="center">
+  A high-throughput, low-latency campus transit management platform providing real-time fleet telemetry streaming, dynamic passenger occupancy tracking, geofence boundary detection, and automated dispatch operations.
+</p>
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+[System Architecture](#-system-architecture) •
+[Key Features](#-key-features) •
+[Tech Stack](#-tech-stack) •
+[Telemetry & GraphQL API](#-telemetry-specification--graphql-api) •
+[High-Level Code](#-core-implementation-snippets) •
+[Getting Started](#-local-installation--setup) •
+[Roadmap](#-future-roadmap)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+</div>
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+## 📸 Operations Console Preview
