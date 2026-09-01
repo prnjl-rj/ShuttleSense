@@ -75,28 +75,25 @@
 
 ---
 
-## 🏗 System Architecture
+### **Architectural Layers Breakdown**
 
-The ShuttleSense architecture bridges IoT telemetry edge ingestion with a serverless event-driven processing backbone, pushing sub-second updates directly to web and mobile clients.
+| Layer | AWS Component | Protocols / Engines | Primary Responsibilities |
+| :--- | :--- | :--- | :--- |
+| **1. Edge & Telemetry** | IoT Edge Node | MQTT v5 (`QoS 1`) | Captures GPS coordinates, vehicle speed, and IR sensor passenger counts; packages and transmits JSON telemetry packets every 3–5 seconds. |
+| **2. Ingestion & Routing** | AWS IoT Core | IoT SQL Rules Engine | Ingests MQTT topic messages on `shuttlesense/telemetry/+` and invokes the serverless processing function without queue latency. |
+| **3. Compute & Business Logic** | AWS Lambda | Python 3.12 Serverless | Computes threshold occupancy categories (`GREEN`, `YELLOW`, `RED`), updates the datastore, evaluates stop geofences, and executes AppSync mutations. |
+| **4. Persistence & Cache** | Amazon DynamoDB | Key-Value NoSQL (`PAY_PER_REQUEST`) | Stores current vehicle states in the `LiveShuttles` table with a 600-second Time-To-Live (TTL) for auto-expiring stale records. |
+| **5. Real-Time Fanout** | AWS AppSync | GraphQL over WebSockets (`wss://`) | Delivers sub-second push notifications to connected clients on the `onShuttleLocationUpdated` subscription whenever a mutation occurs. |
+| **6. Security & Identity** | Amazon Cognito | OAuth 2.0 / JWT User Pools | Enforces Role-Based Access Control (RBAC) separating administrative fleet managers from students and drivers. |
+| **7. Geospatial & Mapping** | Amazon Location & MapLibre | Vector Tiles & Geofences | Evaluates virtual perimeters around campus stops and renders vector tracking layers in the frontend interface. |
+| **8. Operations & Client UI** | React 19 & Flutter | Vite 6, Tailwind CSS v4, Dart SDK | Provides administrative monitoring consoles for dispatchers and dynamic transit passes for mobile users. |
 
-```mermaid
-graph TD
-    subgraph Edge["Edge Devices and Transit Fleet"]
-        VehicleNode["GPS and IR Vehicle Node"] -->|MQTT Publish| IoTTopic["shuttlesense/telemetry/shuttle_id"]
-    end
+---
 
-    subgraph AWS["AWS Serverless Processing Engine"]
-        IoTTopic -->|IoT Rule Evaluation| LambdaProc["TelemetryProcessorLambda"]
-        LambdaProc -->|PutItem with TTL| DynamoDB[(DynamoDB LiveShuttles)]
-        LambdaProc -->|GraphQL Mutation| AppSyncAPI["AWS AppSync GraphQL API"]
-        LambdaProc -->|Track Coordinates| LocationSvc["Amazon Location Geofencing"]
-        LocationSvc -->|Geofence Breach| SNSAlert["Amazon SNS Notification Hub"]
-    end
+### **Step-by-Step Telemetry Lifecycle**
 
-    subgraph Clients["Web and Mobile Client Interface"]
-        AppSyncAPI -->|WSS Subscriptions| AdminDashboard["React 19 Admin Operations Console"]
-        AppSyncAPI -->|WSS Subscriptions| MobileApp["Flutter Student and Driver App"]
-        CognitoAuth["Amazon Cognito User Pool"] -->|JWT Auth| AdminDashboard
-        CognitoAuth -->|RBAC Verification| MobileApp
-    end
-```
+1. **Edge Broadcast:** The vehicle hardware sends a lightweight JSON payload to topic `shuttlesense/telemetry/SHUTTLE_01`.
+2. **Rule Ingestion:** AWS IoT Core intercepts the MQTT payload via SQL topic rule `SELECT * FROM 'shuttlesense/telemetry/+'` and triggers `TelemetryProcessorLambda`.
+3. **Classification & Storage:** Lambda calculates whether the shuttle is under capacity (`GREEN`), near capacity (`YELLOW`), or full (`RED`), then writes the record directly to DynamoDB with a 10-minute TTL.
+4. **AppSync Broadcast:** Lambda performs an authenticated `publishLocation` GraphQL mutation to the AppSync endpoint.
+5. **Real-Time Client Updates:** AppSync fans out the updated telemetry payload across active WebSocket connections, updating React operations cards and moving MapLibre map markers without refreshing the page.
