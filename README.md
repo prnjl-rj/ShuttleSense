@@ -22,7 +22,7 @@
 [Key Features](#-key-features) •
 [Tech Stack](#-tech-stack) •
 [Telemetry & GraphQL API](#-telemetry-specification--graphql-api) •
-[High-Level Code](#-core-implementation-snippets) •
+[Core Implementation](#-core-implementation-snippets) •
 [Getting Started](#-local-installation--setup) •
 [Roadmap](#-future-roadmap)
 
@@ -31,3 +31,71 @@
 </div>
 
 ## 📸 Operations Console Preview
+
+<table>
+<tr>
+<td colspan="2" bgcolor="#0b1120">
+  <b>🚌 ShuttleSense Operations Console</b> &nbsp;|&nbsp; <code>Live Fleet Telemetry & Transit Management</code>
+  <span align="right" style="float: right;">🟢 <b>AppSync Real-Time Active</b></span>
+</td>
+</tr>
+<tr>
+<td width="50%" bgcolor="#0f172a">
+  <h4>🚍 SHUTTLE_01 <span style="background-color: #78350f; color: #fbbf24; padding: 2px 8px; border-radius: 4px; font-size: 11px;">🟡 YELLOW OCCUPANCY</span></h4>
+  <p><code>Lat: 12.972100, Lng: 79.159400</code></p>
+  <table>
+    <tr>
+      <td bgcolor="#020617">👥 <b>Occupancy</b><br/><h3>36 / 40</h3></td>
+      <td bgcolor="#020617">⚡ <b>Speed</b><br/><h3>42.5 km/h</h3></td>
+    </tr>
+  </table>
+  <small>🛡️ Driver Safe &nbsp;•&nbsp; Updated: <i>Just now</i></small>
+</td>
+<td width="50%" bgcolor="#0f172a">
+  <h4>🚍 SHUTTLE_02 <span style="background-color: #064e3b; color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 11px;">🟢 GREEN OCCUPANCY</span></h4>
+  <p><code>Lat: 12.974500, Lng: 79.162300</code></p>
+  <table>
+    <tr>
+      <td bgcolor="#020617">👥 <b>Occupancy</b><br/><h3>14 / 40</h3></td>
+      <td bgcolor="#020617">⚡ <b>Speed</b><br/><h3>28.0 km/h</h3></td>
+    </tr>
+  </table>
+  <small>🛡️ Driver Safe &nbsp;•&nbsp; Updated: <i>Just now</i></small>
+</td>
+</tr>
+<tr>
+<td colspan="2" bgcolor="#020617" align="center">
+  <br/>
+  <b>🗺️ Interactive Campus Vector Map (MapLibre GL Engine)</b><br/>
+  <code>📍 Center: 12.971598 N, 79.158812 E &nbsp;|&nbsp; Zoom: 15x &nbsp;|&nbsp; Geofence Stops: Main Gate, Tech Park, Hostels</code>
+  <br/><br/>
+</td>
+</tr>
+</table>
+
+---
+
+## 🏗 System Architecture
+
+The ShuttleSense architecture bridges IoT telemetry edge ingestion with a serverless event-driven processing backbone, pushing sub-second updates directly to web and mobile clients.
+
+```mermaid
+flowchart TD
+    subgraph EdgeLayer [Edge Devices & Transit Fleet]
+        VehicleNode["📡 GPS & IR Vehicle Node"] -->|MQTT Publish| IoTTopic["shuttlesense/telemetry/{id}"]
+    end
+
+    subgraph AWSCloud [AWS Serverless Processing Engine]
+        IoTTopic -->|IoT Rule Evaluation| LambdaProc["⚡ TelemetryProcessorLambda"]
+        LambdaProc -->|PutItem with TTL| DynamoDB[("🗄️ DynamoDB LiveShuttles")]
+        LambdaProc -->|GraphQL Mutation| AppSyncAPI["🔄 AWS AppSync GraphQL API"]
+        LambdaProc -->|Track Coordinates| LocationSvc["📍 Amazon Location Geofencing"]
+        LocationSvc -->|Geofence Breach| SNSAlert["🔔 Amazon SNS Notification Hub"]
+    end
+
+    subgraph Presentation [Web & Mobile Client Interface]
+        AppSyncAPI -->|WSS Subscriptions| AdminDashboard["💻 React 19 Admin Operations Console"]
+        AppSyncAPI -->|WSS Subscriptions| MobileApp["📱 Flutter Student & Driver App"]
+        CognitoAuth["🔐 Amazon Cognito User Pool"] -.->|JWT Auth| AdminDashboard
+        CognitoAuth -.->|RBAC Verification| MobileApp
+    end
